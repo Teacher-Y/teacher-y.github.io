@@ -12,16 +12,21 @@
 
         body {
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background-color: #f0f8ff;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
         }
 
         #game-container {
-            width: 800px;
-            height: 600px;
+            width: 100%;
+            max-width: 1200px;
+            height: 100vh;
+            max-height: 100vh;
             background: #ffffff;
             border: 4px solid #4a90e2;
             border-radius: 12px;
@@ -34,15 +39,16 @@
 
         /* Top Header */
         #header {
-            height: 60px;
-            padding: 0 20px;
+            flex: 0 0 auto;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #e6f2ff;
             border-bottom: 2px solid #b3d7ff;
-            font-size: 24px;
+            font-size: clamp(18px, 4vw, 28px);
             font-weight: bold;
+            min-height: 60px;
         }
 
         #timer { color: #d9534f; }
@@ -53,71 +59,86 @@
             flex: 1;
             position: relative;
             background: #fafafa;
+            overflow: hidden;
+            min-height: 300px;
         }
 
         .game-img {
             position: absolute;
-            width: 70px;
-            height: 70px;
+            width: clamp(50px, 8vw, 100px);
+            height: clamp(50px, 8vw, 100px);
             object-fit: contain;
             user-select: none;
         }
 
         /* Bottom Controls */
         #controls {
-            height: 90px;
+            flex: 0 0 auto;
             background: #e6f2ff;
             border-top: 2px solid #b3d7ff;
             display: flex;
-            justify-content: space-around;
+            flex-wrap: wrap;
+            justify-content: center;
             align-items: center;
-            padding: 0 20px;
+            gap: 15px;
+            padding: 15px 20px;
+            min-height: 100px;
         }
 
         .word-box {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 24px;
+            gap: 8px;
+            font-size: clamp(16px, 3vw, 24px);
             font-weight: bold;
             position: relative;
+            white-space: nowrap;
         }
 
         .count-input {
-            width: 60px;
-            height: 40px;
-            font-size: 22px;
+            width: clamp(50px, 8vw, 80px);
+            height: clamp(35px, 6vw, 50px);
+            font-size: clamp(16px, 3vw, 22px);
             text-align: center;
             border: 2px solid #4a90e2;
             border-radius: 6px;
+            padding: 5px;
+        }
+
+        #feedback1,
+        #feedback2 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: clamp(35px, 6vw, 50px);
+            min-width: clamp(30px, 5vw, 50px);
         }
 
         .feedback-icon {
-            width: 35px;
-            height: 35px;
-            position: absolute;
-            right: -45px;
+            width: clamp(30px, 5vw, 50px);
+            height: clamp(30px, 5vw, 50px);
             object-fit: contain;
         }
 
         .green-tick {
             color: #5cb85c;
-            font-size: 32px;
+            font-size: clamp(24px, 5vw, 40px);
             font-weight: bold;
-            position: absolute;
-            right: -40px;
+            line-height: 1;
         }
 
         /* Action Buttons */
         .btn {
-            padding: 10px 24px;
-            font-size: 20px;
+            padding: clamp(8px, 2vw, 12px) clamp(16px, 3vw, 28px);
+            font-size: clamp(16px, 3vw, 22px);
             font-weight: bold;
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             transition: background 0.2s;
+            white-space: nowrap;
+            touch-action: manipulation;
         }
 
         #btn-start { background-color: #5cb85c; }
@@ -136,11 +157,103 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, #5b6dd6 0%, #8b5cf6 50%, #a78bfa 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
+            gap: 20px;
+        }
+
+        #start-overlay .title {
+            font-size: clamp(32px, 8vw, 64px);
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin: 0;
+        }
+
+        #start-overlay .subtitle {
+            font-size: clamp(16px, 4vw, 28px);
+            color: rgba(255, 255, 255, 0.85);
+            text-align: center;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #btn-start {
+            background: linear-gradient(135deg, #52c77a 0%, #3ba569 100%);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            padding: clamp(12px, 3vw, 20px) clamp(40px, 8vw, 60px) !important;
+            font-size: clamp(20px, 5vw, 32px) !important;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        #btn-start:hover {
+            background: linear-gradient(135deg, #5dd985 0%, #42b574 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        #btn-start:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* iPad Landscape Optimization */
+        @media (min-width: 768px) and (orientation: landscape) {
+            body {
+                padding: 5px;
+            }
+
+            #game-container {
+                height: 100vh;
+            }
+
+            #controls {
+                gap: 20px;
+                padding: 12px 20px;
+                min-height: 90px;
+            }
+        }
+
+        /* iPad Portrait Optimization */
+        @media (min-width: 768px) and (orientation: portrait) {
+            #controls {
+                gap: 15px;
+            }
+        }
+
+        /* Large tablets and desktops */
+        @media (min-width: 1024px) {
+            body {
+                padding: 20px;
+            }
+
+            #game-container {
+                height: auto;
+                aspect-ratio: 16 / 10;
+                max-height: 100vh;
+            }
+
+            #controls {
+                gap: 25px;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            #controls {
+                gap: 10px;
+                padding: 12px 10px;
+            }
+
+            .word-box {
+                gap: 6px;
+            }
         }
     </style>
 </head>
@@ -176,7 +289,9 @@
 
     <!-- Start Overlay -->
     <div id="start-overlay">
-        <button id="btn-start" class="btn" style="font-size: 32px; padding: 15px 40px;" onclick="startGame()">开始</button>
+        <h1 class="title">拼音计数游戏</h1>
+        <p class="subtitle">卡牌计数，学习汉语</p>
+        <button id="btn-start" class="btn" onclick="startGame()">开始游戏</button>
     </div>
 </div>
 
@@ -201,12 +316,24 @@
     let currentRow = null;
     let isRoundEvaluating = false;
 
-    const imgSize = 70;
-    const stageWidth = 800;
-    const stageHeight = 450;
+    let imgSize = 70;
+    let stageWidth = 800;
+    let stageHeight = 450;
+
+    // Update dimensions based on actual stage element
+    function updateStageDimensions() {
+        const stage = document.getElementById('stage');
+        if (stage) {
+            stageWidth = stage.offsetWidth;
+            stageHeight = stage.offsetHeight;
+            // Calculate image size as percentage of stage width
+            imgSize = Math.max(50, Math.min(100, stageWidth * 0.1));
+        }
+    }
 
     function startGame() {
         document.getElementById('start-overlay').style.display = 'none';
+        updateStageDimensions();
         currentScore = 0;
         document.getElementById('score-val').textContent = currentScore;
         lastRowIndex = -1;
@@ -231,8 +358,15 @@
         isRoundEvaluating = false;
     }
 
+    // Handle orientation changes and resizing
+    window.addEventListener('resize', updateStageDimensions);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(updateStageDimensions, 100);
+    });
+
     function startNextRound() {
         isRoundEvaluating = false;
+        updateStageDimensions();
         document.getElementById('feedback1').innerHTML = '';
         document.getElementById('feedback2').innerHTML = '';
         document.getElementById('input1').value = '';
@@ -336,9 +470,10 @@
         const isCorrect1 = val1 === currentRow.count1;
         const isCorrect2 = val2 === currentRow.count2;
 
-        // Calculate score additions/deductions
+        // Calculate score additions/deductions with minimum of 0
         currentScore += isCorrect1 ? 100 : -20;
         currentScore += isCorrect2 ? 100 : -20;
+        currentScore = Math.max(0, currentScore);
         document.getElementById('score-val').textContent = currentScore;
 
         // Render evaluation visuals
