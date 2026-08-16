@@ -481,7 +481,7 @@
         renderFeedback(2, isCorrect2, currentRow.img2);
 
         // Proceed after 1 second if there are incorrect answers, otherwise jump immediately or standard short delay
-        const delay = (!isCorrect1 || !isCorrect2) ? 1000 : 800;
+        const delay = (!isCorrect1 || !isCorrect2) ? 2000 : 1500;
         setTimeout(startNextRound, delay);
     }
 
