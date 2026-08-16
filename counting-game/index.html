@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counting & Vocabulary Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-container {
+            width: 800px;
+            height: 600px;
+            background: #ffffff;
+            border: 4px solid #4a90e2;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        #header {
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e6f2ff;
+            border-bottom: 2px solid #b3d7ff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #timer { color: #d9534f; }
+        #score { color: #5cb85c; }
+
+        /* Game Stage Area */
+        #stage {
+            flex: 1;
+            position: relative;
+            background: #fafafa;
+        }
+
+        .game-img {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            user-select: none;
+        }
+
+        /* Bottom Controls */
+        #controls {
+            height: 90px;
+            background: #e6f2ff;
+            border-top: 2px solid #b3d7ff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .word-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .count-input {
+            width: 60px;
+            height: 40px;
+            font-size: 22px;
+            text-align: center;
+            border: 2px solid #4a90e2;
+            border-radius: 6px;
+        }
+
+        .feedback-icon {
+            width: 35px;
+            height: 35px;
+            position: absolute;
+            right: -45px;
+            object-fit: contain;
+        }
+
+        .green-tick {
+            color: #5cb85c;
+            font-size: 32px;
+            font-weight: bold;
+            position: absolute;
+            right: -40px;
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 10px 24px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #btn-start { background-color: #5cb85c; }
+        #btn-start:hover { background-color: #4cae4c; }
+
+        #btn-submit { background-color: #0275d8; }
+        #btn-submit:hover { background-color: #025aa5; }
+
+        #btn-reset { background-color: #d9534f; }
+        #btn-reset:hover { background-color: #c9302c; }
+
+        /* Start Overlay */
+        #start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- Header -->
+    <div id="header">
+        <div id="timer">⏰ Time: <span id="timer-val">15</span>s</div>
+        <div id="score">Score: <span id="score-val">0</span></div>
+    </div>
+
+    <!-- Main Game Canvas -->
+    <div id="stage"></div>
+
+    <!-- Bottom Input Controls -->
+    <div id="controls">
+        <div class="word-box">
+            <span id="word1-label">--</span>:
+            <input type="number" id="input1" class="count-input" min="0" disabled>
+            <div id="feedback1"></div>
+        </div>
+
+        <div class="word-box">
+            <span id="word2-label">--</span>:
+            <input type="number" id="input2" class="count-input" min="0" disabled>
+            <div id="feedback2"></div>
+        </div>
+
+        <button id="btn-submit" class="btn" onclick="submitAnswer()" disabled>Submit</button>
+        <button id="btn-reset" class="btn" onclick="resetGame()">Reset</button>
+    </div>
+
+    <!-- Start Overlay -->
+    <div id="start-overlay">
+        <button id="btn-start" class="btn" style="font-size: 32px; padding: 15px 40px;" onclick="startGame()">开始</button>
+    </div>
+</div>
+
+<script>
+    // Game dataset based on the requested table (Row 2 to Row 10)
+    const gameData = [
+        { img1: "chong.jpg", word1: "chǒng", count1: 3, img2: "chong.jpg", word2: "chǒng", count2: 5 },
+        { img1: "guai.jpg",  word1: "guāi",  count1: 6, img2: "jiao.jpg",  word2: "jiào",  count2: 3 },
+        { img1: "jin.jpg",   word1: "jīn",   count1: 5, img2: "piao.jpg",  word2: "piào",  count2: 4 },
+        { img1: "shui.jpg",  word1: "shuì",  count1: 4, img2: "tu.jpg",    word2: "tù",    count2: 5 },
+        { img1: "yu.jpg",    word1: "yǔ",    count1: 5, img2: "zao.jpg",   word2: "zǎo",   count2: 7 },
+        { img1: "zong.jpg",  word1: "zǒng",  count1: 3, img2: "cong.jpg",  word2: "cōng",  count2: 6 },
+        { img1: "piao.jpg",  word1: "piào",  count1: 4, img2: "chong.jpg", word2: "chǒng", count2: 3 },
+        { img1: "zao.jpg",   word1: "zǎo",   count1: 7, img2: "jin.jpg",   word2: "jīn",   count2: 5 },
+        { img1: "shui.jpg",  word1: "shuì",  count1: 4, img2: "cong.jpg",  word2: "cōng",  count2: 6 }
+    ];
+
+    let currentScore = 0;
+    let timerInterval = null;
+    let timeLeft = 15;
+    let lastRowIndex = -1;
+    let currentRow = null;
+    let isRoundEvaluating = false;
+
+    const imgSize = 70;
+    const stageWidth = 800;
+    const stageHeight = 450;
+
+    function startGame() {
+        document.getElementById('start-overlay').style.display = 'none';
+        currentScore = 0;
+        document.getElementById('score-val').textContent = currentScore;
+        lastRowIndex = -1;
+        startNextRound();
+    }
+
+    function resetGame() {
+        clearInterval(timerInterval);
+        document.getElementById('start-overlay').style.display = 'flex';
+        document.getElementById('stage').innerHTML = '';
+        document.getElementById('word1-label').textContent = '--';
+        document.getElementById('word2-label').textContent = '--';
+        document.getElementById('input1').value = '';
+        document.getElementById('input2').value = '';
+        document.getElementById('input1').disabled = true;
+        document.getElementById('input2').disabled = true;
+        document.getElementById('btn-submit').disabled = true;
+        document.getElementById('feedback1').innerHTML = '';
+        document.getElementById('feedback2').innerHTML = '';
+        document.getElementById('timer-val').textContent = '15';
+        document.getElementById('score-val').textContent = '0';
+        isRoundEvaluating = false;
+    }
+
+    function startNextRound() {
+        isRoundEvaluating = false;
+        document.getElementById('feedback1').innerHTML = '';
+        document.getElementById('feedback2').innerHTML = '';
+        document.getElementById('input1').value = '';
+        document.getElementById('input2').value = '';
+        document.getElementById('input1').disabled = false;
+        document.getElementById('input2').disabled = false;
+        document.getElementById('btn-submit').disabled = false;
+
+        // Select non-repeating row from row 2-10
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * gameData.length);
+        } while (randomIndex === lastRowIndex && gameData.length > 1);
+
+        lastRowIndex = randomIndex;
+        currentRow = gameData[randomIndex];
+
+        // Setup bottom labels
+        document.getElementById('word1-label').textContent = currentRow.word1;
+        document.getElementById('word2-label').textContent = currentRow.word2;
+
+        // Render scattered images
+        renderImages(currentRow);
+
+        // Reset and start 15s timer
+        clearInterval(timerInterval);
+        timeLeft = 15;
+        document.getElementById('timer-val').textContent = timeLeft;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer-val').textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitAnswer();
+            }
+        }, 1000);
+    }
+
+    function renderImages(row) {
+        const stage = document.getElementById('stage');
+        stage.innerHTML = '';
+
+        // Combine images for this round
+        let itemsList = [];
+        for (let i = 0; i < row.count1; i++) itemsList.push(row.img1);
+        for (let i = 0; i < row.count2; i++) itemsList.push(row.img2);
+
+        // Keep track of placed bounds to prevent overlap
+        let placedPositions = [];
+
+        itemsList.forEach(imgSrc => {
+            let pos = getNonOverlappingPos(placedPositions);
+            placedPositions.push(pos);
+
+            let img = document.createElement('img');
+            img.src = imgSrc;
+            img.className = 'game-img';
+            img.style.left = pos.x + 'px';
+            img.style.top = pos.y + 'px';
+            stage.appendChild(img);
+        });
+    }
+
+    function getNonOverlappingPos(existing) {
+        let maxAttempts = 200;
+        let x, y, overlap;
+
+        for (let i = 0; i < maxAttempts; i++) {
+            x = Math.floor(Math.random() * (stageWidth - imgSize));
+            y = Math.floor(Math.random() * (stageHeight - imgSize));
+            overlap = false;
+
+            for (let b of existing) {
+                if (
+                    x < b.x + imgSize &&
+                    x + imgSize > b.x &&
+                    y < b.y + imgSize &&
+                    y + imgSize > b.y
+                ) {
+                    overlap = true;
+                    break;
+                }
+            }
+            if (!overlap) return { x, y };
+        }
+        return { x, y }; // Fallback position if tightly packed
+    }
+
+    function submitAnswer() {
+        if (isRoundEvaluating) return;
+        isRoundEvaluating = true;
+        clearInterval(timerInterval);
+
+        document.getElementById('input1').disabled = true;
+        document.getElementById('input2').disabled = true;
+        document.getElementById('btn-submit').disabled = true;
+
+        const val1 = parseInt(document.getElementById('input1').value.trim(), 10);
+        const val2 = parseInt(document.getElementById('input2').value.trim(), 10);
+
+        const isCorrect1 = val1 === currentRow.count1;
+        const isCorrect2 = val2 === currentRow.count2;
+
+        // Calculate score additions/deductions
+        currentScore += isCorrect1 ? 100 : -20;
+        currentScore += isCorrect2 ? 100 : -20;
+        document.getElementById('score-val').textContent = currentScore;
+
+        // Render evaluation visuals
+        renderFeedback(1, isCorrect1, currentRow.img1);
+        renderFeedback(2, isCorrect2, currentRow.img2);
+
+        // Proceed after 1 second if there are incorrect answers, otherwise jump immediately or standard short delay
+        const delay = (!isCorrect1 || !isCorrect2) ? 1000 : 800;
+        setTimeout(startNextRound, delay);
+    }
+
+    function renderFeedback(slotNum, isCorrect, imgSrc) {
+        const targetDiv = document.getElementById(`feedback${slotNum}`);
+        targetDiv.innerHTML = '';
+
+        if (isCorrect) {
+            targetDiv.innerHTML = `<span class="green-tick">✓</span>`;
+        } else {
+            targetDiv.innerHTML = `<img src="${imgSrc}" class="feedback-icon" alt="Correct Image">`;
+        }
+    }
+</script>
+
+</body>
+</html>
