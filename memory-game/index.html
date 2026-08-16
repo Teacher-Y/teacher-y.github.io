@@ -214,9 +214,93 @@
       from { transform: scale(0.8); }
       to { transform: scale(1.2); }
     }
+
+    /* Starting Modal Overlay */
+    #start-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease-out;
+    }
+
+    #start-modal.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-content {
+      text-align: center;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-title {
+      font-size: 72px;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 20px;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      letter-spacing: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 28px;
+      color: #ffffff;
+      margin-bottom: 50px;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .btn-start-modal {
+      font-size: 36px;
+      font-weight: bold;
+      padding: 20px 60px;
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-start-modal:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-start-modal:active {
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
+
+  <!-- Starting Modal -->
+  <div id="start-modal">
+    <div class="modal-content">
+      <div class="modal-title">拼音记忆游戏</div>
+      <div class="modal-subtitle">记忆卡牌，学习汉语</div>
+      <button class="btn-start-modal" id="modal-start-btn">开始游戏</button>
+    </div>
+  </div>
 
   <div id="app-container">
     <!-- Star Overlay -->
@@ -265,10 +349,13 @@
     const startBtn = document.getElementById('start-btn');
     const resetBtn = document.getElementById('reset-btn');
     const starOverlay = document.getElementById('star-overlay');
+    const startModal = document.getElementById('start-modal');
+    const modalStartBtn = document.getElementById('modal-start-btn');
 
     // Event Listeners
     startBtn.addEventListener('click', startGame);
     resetBtn.addEventListener('click', fullReset);
+    modalStartBtn.addEventListener('click', closeModal);
 
     // Load card configuration from JSON
     async function loadCardsConfig() {
@@ -284,6 +371,12 @@
 
     // Initialize game on page load
     loadCardsConfig();
+
+    // 0. Close Modal and Start Game
+    function closeModal() {
+      startModal.classList.add('hide');
+      startGame();
+    }
 
     // 1. Fully Reset the Game
     function fullReset() {
