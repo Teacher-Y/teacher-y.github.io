@@ -343,12 +343,12 @@
 
       // 15-second initial viewing countdown
       timerValue = 15;
-      timerEl.textContent = `Timer: ${timerValue}s`;
+      timerEl.textContent = `计时: ${timerValue}s`;
 
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timerValue--;
-        timerEl.textContent = `Timer: ${timerValue}s`;
+        timerEl.textContent = `计时: ${timerValue}s`;
         if (timerValue <= 0) {
           clearInterval(timerInterval);
           hideCardsAndBeginMatch();
