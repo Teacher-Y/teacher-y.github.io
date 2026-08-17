@@ -227,6 +227,20 @@
             font-size: 0.9em;
             margin-top: 10px;
         }
+
+        #timer.warning {
+            color: #C41E3A;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -250,12 +264,8 @@
                     <div class="score-value" id="score">0</div>
                 </div>
                 <div class="score-item">
-                    <div class="score-label">Round</div>
-                    <div class="score-value" id="round">1/5</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">Accuracy</div>
-                    <div class="score-value" id="accuracy">-</div>
+                    <div class="score-label">Time Left</div>
+                    <div class="score-value" id="timer">30</div>
                 </div>
             </div>
 
@@ -299,6 +309,42 @@
         let currentGame = null;
         let currentVegetable = null;
         let vegetables = [];
+        let timerInterval = null;
+        let timeRemaining = 30;
+        const TIMER_DURATION = 30;
+
+        function startTimer() {
+            timeRemaining = TIMER_DURATION;
+            const timerElement = document.getElementById('timer');
+            timerElement.textContent = timeRemaining;
+            timerElement.classList.remove('warning');
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerElement.textContent = timeRemaining;
+
+                if (timeRemaining <= 10) {
+                    timerElement.classList.add('warning');
+                }
+
+                if (timeRemaining <= 0) {
+                    stopTimer();
+                    // Auto-submit with current input or 0 if empty
+                    const currentInput = document.getElementById('answerInput').value;
+                    if (currentInput === '') {
+                        document.getElementById('answerInput').value = 0;
+                    }
+                    submitAnswer();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
 
         // Load game data from JSON
         async function loadGameData() {
@@ -360,13 +406,18 @@
             // Update UI
             document.getElementById('gameImage').src = currentGame.image;
             document.getElementById('vegetableLabel').textContent = currentVegetable;
-            document.getElementById('round').textContent = currentQuestion + '/' + totalQuestions;
             document.getElementById('answerInput').value = '';
             document.getElementById('answerInput').focus();
             document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
+            
+            // Start the timer for this question
+            stopTimer();
+            startTimer();
         }
 
         function submitAnswer() {
+            stopTimer();
+            
             const userAnswer = parseInt(document.getElementById('answerInput').value);
 
             if (isNaN(userAnswer)) {
@@ -388,8 +439,6 @@
             }
 
             document.getElementById('score').textContent = currentScore;
-            document.getElementById('accuracy').textContent =
-                Math.round((currentScore / currentQuestion) * 100) + '%';
 
             // Move to next vegetable
             currentVegetableIndex++;
@@ -401,13 +450,14 @@
         }
 
         function endGame() {
+            stopTimer();
             document.getElementById('gameScreen').classList.remove('active');
             document.getElementById('endScreen').classList.add('active');
-            document.getElementById('finalScore').textContent = currentScore + '/' + totalRounds;
+            document.getElementById('finalScore').textContent = currentScore + '/' + totalQuestions;
 
             let message = '';
             let emoji = '';
-            const percentage = Math.round((currentScore / totalRounds) * 100);
+            const percentage = Math.round((currentScore / totalQuestions) * 100);
 
             if (currentScore === totalRounds) {
                 emoji = '🌟';
