@@ -38,12 +38,14 @@
 
         .container.game-active {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            padding: 40px;
-            max-width: 700px;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+            max-width: 100%;
             width: 100%;
-            height: auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
@@ -63,10 +65,11 @@
         .score-board {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 30px;
+            margin-bottom: 8px;
             background: #f0f0f0;
-            padding: 20px;
+            padding: 8px;
             border-radius: 10px;
+            flex-shrink: 0;
         }
 
         .score-item {
@@ -75,27 +78,34 @@
 
         .score-label {
             color: #666;
-            font-size: 0.9em;
-            margin-bottom: 5px;
+            font-size: 0.75em;
+            margin-bottom: 2px;
         }
 
         .score-value {
-            font-size: 2em;
+            font-size: 1.3em;
             font-weight: bold;
             color: #667eea;
         }
 
         .game-area {
             text-align: center;
-            margin: 30px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 10px;
         }
 
         .image-container {
-            margin: 20px 0;
+            margin: 0;
             background: #f9f9f9;
-            padding: 20px;
+            padding: 8px;
             border-radius: 10px;
             display: none;
+            flex-shrink: 0;
         }
 
         .image-container.active {
@@ -104,43 +114,45 @@
 
         .game-image {
             max-width: 100%;
+            max-height: 180px;
             height: auto;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .question {
-            font-size: 1.5em;
+            font-size: 1.1em;
             color: #333;
-            margin: 20px 0;
+            margin: 8px 0 4px 0;
             font-weight: bold;
         }
 
         .vegetable-label {
             display: inline-block;
-            padding: 10px 20px;
+            padding: 6px 12px;
             background: #FFE4B5;
             border-radius: 25px;
-            margin: 10px 0;
-            font-size: 1.3em;
+            margin: 2px 0;
+            font-size: 0.95em;
             color: #D2691E;
             font-weight: bold;
         }
 
         .input-group {
             display: flex;
-            gap: 10px;
+            gap: 6px;
             justify-content: center;
-            margin: 20px 0;
+            margin: 8px 0;
             flex-wrap: wrap;
+            flex-shrink: 0;
         }
 
         input[type="number"] {
-            padding: 12px 20px;
-            font-size: 1.1em;
+            padding: 8px 12px;
+            font-size: 0.95em;
             border: 2px solid #667eea;
             border-radius: 8px;
-            width: 120px;
+            width: 90px;
             text-align: center;
         }
 
@@ -151,8 +163,8 @@
         }
 
         button {
-            padding: 12px 30px;
-            font-size: 1.1em;
+            padding: 8px 20px;
+            font-size: 0.95em;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -172,12 +184,13 @@
         }
 
         .feedback {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 8px;
+            padding: 10px;
             border-radius: 8px;
-            font-size: 1.1em;
+            font-size: 0.9em;
             font-weight: bold;
             display: none;
+            flex-shrink: 0;
         }
 
         .feedback.show {
@@ -332,10 +345,23 @@
 
         .game-screen {
             display: none;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            padding: 12px;
+            box-sizing: border-box;
         }
 
         .game-screen.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-screen h1 {
+            font-size: 1.4em;
+            margin: 0 0 8px 0;
+            flex-shrink: 0;
         }
 
         .end-screen {
@@ -361,30 +387,30 @@
 
         .keyboard-hint {
             color: #999;
-            font-size: 0.9em;
-            margin-top: 10px;
+            font-size: 0.7em;
+            margin: 2px 0;
+            flex-shrink: 0;
         }
 
         .virtual-keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 20px;
-            padding: 15px;
+            gap: 5px;
+            margin: 8px auto;
+            padding: 8px;
             background: #f5f5f5;
             border-radius: 10px;
-            max-width: 300px;
-            margin-left: auto;
-            margin-right: auto;
+            max-width: 260px;
+            flex-shrink: 0;
         }
 
         .keypad-button {
-            padding: 12px 8px;
-            font-size: 1.2em;
+            padding: 8px 4px;
+            font-size: 0.95em;
             font-weight: bold;
             background: #e0e0e0;
             border: 2px solid #999;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
             color: #333;
@@ -392,7 +418,7 @@
 
         .keypad-button:hover {
             background: #d0d0d0;
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
 
         .keypad-button:active {
@@ -460,10 +486,7 @@
     <div class="container">
         <!-- Start Screen -->
         <div class="start-screen" id="startScreen">
-            <h1>🥦 拼音计数游戏 🥕</h1>
-            <div class="vegetable-decoration">
-                🌽 🥬 🥒 🍅 🧅
-            </div>
+            <h1>🥦 🌽 🥬 蔬菜大挑战 🥕 🥒 🍅</h1>
 
             <button class="start-button" onclick="startGame()">开始游戏</button>
         </div>
