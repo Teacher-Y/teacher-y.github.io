@@ -18,16 +18,32 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
         }
 
         .container {
+            background: transparent;
+            border-radius: 20px;
+            box-shadow: none;
+            padding: 0;
+            max-width: 100%;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container.game-active {
             background: white;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             padding: 40px;
             max-width: 700px;
             width: 100%;
+            height: auto;
         }
 
         h1 {
@@ -184,13 +200,134 @@
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            min-height: calc(100vh - 80px);
+            padding: 40px 20px;
+        }
+
+        .start-screen h1 {
+            font-size: 3.5em;
+            color: white;
+            margin: 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 0.05em;
+        }
+
+        .start-screen .subtitle {
+            font-size: 1.5em;
+            color: white;
+            margin: 0;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .start-screen p {
             font-size: 1.1em;
             color: #666;
             margin: 20px 0;
+        }
+
+        .vegetable-decoration {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 2.5em;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .start-button {
+            padding: 20px 50px;
+            font-size: 1.5em;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+            min-width: 280px;
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5);
+        }
+
+        .start-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        /* Responsive for landscape */
+        @media (min-aspect-ratio: 13/9) and (max-height: 700px) {
+            .container {
+                padding: 30px;
+                max-height: 95vh;
+            }
+
+            .start-screen {
+                min-height: auto;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .start-screen h1 {
+                font-size: 3em;
+            }
+
+            .start-screen .subtitle {
+                font-size: 1.3em;
+            }
+
+            .vegetable-decoration {
+                font-size: 2em;
+                gap: 10px;
+            }
+
+            .start-button {
+                padding: 15px 40px;
+                font-size: 1.2em;
+                min-width: 220px;
+            }
+        }
+
+        @media (min-aspect-ratio: 16/9) {
+            .container {
+                max-height: 90vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .start-screen {
+                min-height: auto;
+            }
+
+            .start-screen h1 {
+                font-size: 4em;
+            }
+
+            .start-screen .subtitle {
+                font-size: 1.8em;
+            }
+
+            .vegetable-decoration {
+                font-size: 3.5em;
+            }
         }
 
         .game-screen {
@@ -228,6 +365,82 @@
             margin-top: 10px;
         }
 
+        .virtual-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .keypad-button {
+            padding: 12px 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: #e0e0e0;
+            border: 2px solid #999;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+
+        .keypad-button:hover {
+            background: #d0d0d0;
+            transform: scale(1.05);
+        }
+
+        .keypad-button:active {
+            transform: scale(0.95);
+            background: #c0c0c0;
+        }
+
+        .keypad-button.number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .keypad-button.number:hover {
+            background: linear-gradient(135deg, #7a8eea 0%, #8a5ab2 100%);
+        }
+
+        .keypad-button.action {
+            grid-column: span 1;
+            background: #FF9800;
+            color: white;
+            border-color: #FF9800;
+        }
+
+        .keypad-button.action:hover {
+            background: #FB8C00;
+        }
+
+        .keypad-button.delete {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .keypad-button.delete:hover {
+            background: #da190b;
+        }
+
+        .keypad-button.clear {
+            background: #9C27B0;
+            color: white;
+            border-color: #9C27B0;
+        }
+
+        .keypad-button.clear:hover {
+            background: #8a1f8a;
+        }
+
         #timer.warning {
             color: #C41E3A;
             animation: pulse 0.5s infinite;
@@ -247,12 +460,17 @@
     <div class="container">
         <!-- Start Screen -->
         <div class="start-screen" id="startScreen">
-            <button onclick="startGame()" style="width: 100%; padding: 20px; font-size: 1.3em;">开始游戏</button>
+            <h1>🥦 拼音计数游戏 🥕</h1>
+            <div class="vegetable-decoration">
+                🌽 🥬 🥒 🍅 🧅
+            </div>
+
+            <button class="start-button" onclick="startGame()">开始游戏</button>
         </div>
 
         <!-- Game Screen -->
         <div class="game-screen" id="gameScreen">
-            <h1>🥕 Vegetable Counter 🥬</h1>
+            <h1 style="font-size: 2em; margin-bottom: 20px;">🥕 Vegetable Counter 🥬</h1>
             
             <div class="score-board">
                 <div class="score-item">
@@ -279,6 +497,22 @@
                     <button onclick="submitAnswer()">Submit</button>
                 </div>
                 <div class="keyboard-hint">Press Enter to submit</div>
+
+                <!-- Virtual Keypad -->
+                <div class="virtual-keypad">
+                    <button class="keypad-button number" onclick="addToInput('1')">1</button>
+                    <button class="keypad-button number" onclick="addToInput('2')">2</button>
+                    <button class="keypad-button number" onclick="addToInput('3')">3</button>
+                    <button class="keypad-button number" onclick="addToInput('4')">4</button>
+                    <button class="keypad-button number" onclick="addToInput('5')">5</button>
+                    <button class="keypad-button number" onclick="addToInput('6')">6</button>
+                    <button class="keypad-button number" onclick="addToInput('7')">7</button>
+                    <button class="keypad-button number" onclick="addToInput('8')">8</button>
+                    <button class="keypad-button number" onclick="addToInput('9')">9</button>
+                    <button class="keypad-button clear" onclick="clearInput()">Clear</button>
+                    <button class="keypad-button number" onclick="addToInput('0')">0</button>
+                    <button class="keypad-button delete" onclick="deleteLastDigit()">Delete</button>
+                </div>
 
                 <div class="feedback" id="feedback"></div>
             </div>
@@ -368,6 +602,8 @@
                 alert('Error: No game data loaded');
                 return;
             }
+            const container = document.querySelector('.container');
+            container.classList.add('game-active');
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameScreen').classList.add('active');
             loadNextQuestion();
@@ -447,6 +683,8 @@
 
         function endGame() {
             stopTimer();
+            const container = document.querySelector('.container');
+            container.classList.add('game-active');
             document.getElementById('gameScreen').classList.remove('active');
             document.getElementById('endScreen').classList.add('active');
             document.getElementById('finalScore').textContent = currentScore + '/' + totalQuestions;
@@ -474,6 +712,30 @@
 
             document.getElementById('endEmoji').textContent = emoji;
             document.getElementById('endMessage').textContent = message;
+        }
+
+        // Virtual Keypad Functions
+        function addToInput(digit) {
+            const input = document.getElementById('answerInput');
+            const currentValue = input.value;
+            
+            // Limit to max 2 digits (0-20)
+            if (currentValue.length < 2 || (currentValue.length === 1 && parseInt(currentValue + digit) <= 20)) {
+                input.value = currentValue + digit;
+            }
+            input.focus();
+        }
+
+        function deleteLastDigit() {
+            const input = document.getElementById('answerInput');
+            input.value = input.value.slice(0, -1);
+            input.focus();
+        }
+
+        function clearInput() {
+            const input = document.getElementById('answerInput');
+            input.value = '';
+            input.focus();
         }
 
         // Allow Enter key to submit answer
