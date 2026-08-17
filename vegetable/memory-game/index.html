@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>蔬菜拼音配对游戏 Vegetable Pinyin Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Baloo+2:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-top:#bfe9ff;
+    --sky-bottom:#eafbe7;
+    --leaf:#3fa34d;
+    --leaf-dark:#2c7a39;
+    --sun:#ffcf56;
+    --sun-dark:#e8a92b;
+    --pink:#ff8fc0;
+    --pink-dark:#e4569d;
+    --pink-light:#ffc2e0;
+    --ink:#2f3e2e;
+    --white:#ffffff;
+    --card-radius: 1.1vw;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    width:100%; height:100%;
+    overflow:hidden;
+    font-family:'Fredoka','Baloo 2',sans-serif;
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+    touch-action: manipulation;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+    color: var(--ink);
+  }
+
+  /* ---------- START SCREEN ---------- */
+  #startScreen{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background: radial-gradient(circle at 30% 20%, #d6f5ff 0%, var(--sky-top) 45%, var(--sky-bottom) 100%);
+    z-index: 50;
+    text-align:center;
+    padding: 2vh 4vw;
+  }
+  #startScreen h1{
+    font-family:'Baloo 2',sans-serif;
+    font-size: clamp(28px, 5.2vw, 62px);
+    color: var(--leaf-dark);
+    margin: 0 0 1vh 0;
+    text-shadow: 0 3px 0 rgba(255,255,255,0.6);
+  }
+  #startScreen p{
+    font-size: clamp(14px, 1.8vw, 22px);
+    color: var(--ink);
+    max-width: 60vw;
+    margin: 0 0 3vh 0;
+    opacity:0.85;
+  }
+  .veg-emoji-row{ font-size: clamp(22px, 4vw, 44px); margin-bottom: 2vh; letter-spacing: 1vw; }
+
+  #startBtn{
+    font-family:'Baloo 2',sans-serif;
+    font-size: clamp(20px, 2.6vw, 32px);
+    font-weight:700;
+    color:#fff;
+    background: linear-gradient(180deg, var(--leaf) 0%, var(--leaf-dark) 100%);
+    border:none;
+    border-bottom: 6px solid #1f5a29;
+    padding: 1.6vh 5vw;
+    border-radius: 999px;
+    cursor:pointer;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.08);
+    transition: transform 0.08s ease;
+  }
+  #startBtn:active{ transform: translateY(4px); border-bottom-width: 2px; }
+
+  /* ---------- GAME SCREEN ---------- */
+  #gameScreen{
+    position:fixed; inset:0;
+    display:none;
+    flex-direction: column;
+    align-items:center;
+    padding: 1.2vh 2vw;
+  }
+  #gameScreen.active{ display:flex; }
+
+  .top-bar{
+    width: 100%;
+    max-width: 1200px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 0 0.5vw;
+    height: 11vh;
+    flex-shrink:0;
+  }
+
+  .timer-box{
+    display:flex; align-items:center; gap: 0.6vw;
+    background: var(--white);
+    border-radius: 999px;
+    padding: 0.8vh 1.6vw;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.08);
+    border: 3px solid var(--sun);
+    min-width: 9vw;
+    justify-content:center;
+  }
+  .timer-box .icon{ font-size: clamp(18px,2.4vw,28px); }
+  .timer-box .value{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size: clamp(20px, 2.8vw, 34px);
+    color: var(--leaf-dark);
+    min-width: 2.2ch;
+    text-align:center;
+  }
+  .timer-box.hidden{ visibility:hidden; }
+
+  .status-label{
+    flex:1;
+    text-align:center;
+    font-size: clamp(14px, 2vw, 24px);
+    font-weight:600;
+    color: var(--leaf-dark);
+    padding: 0 1vw;
+  }
+
+  .score-box{
+    display:flex; align-items:center; gap:0.6vw;
+    background: var(--white);
+    border-radius: 999px;
+    padding: 0.8vh 1.8vw;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.08);
+    border: 3px solid var(--pink);
+    min-width: 10vw;
+    justify-content:center;
+  }
+  .score-box .icon{ font-size: clamp(18px,2.4vw,28px); }
+  .score-box .value{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size: clamp(20px, 2.8vw, 34px);
+    color: var(--pink-dark);
+    min-width: 3ch;
+    text-align:center;
+  }
+
+  /* ---------- BOARD ---------- */
+  .board-wrap{
+    position:relative;
+    width: 100%;
+    max-width: 1200px;
+    flex: 1 1 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height: 0;
+  }
+
+  #board{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1.4vw 1.4vw;
+    width: 92%;
+    height: 90%;
+  }
+  #board.locked .card{ pointer-events:none; }
+
+  .card{
+    position:relative;
+    cursor:pointer;
+    perspective: 1000px;
+  }
+  .card-inner{
+    position:relative;
+    width:100%; height:100%;
+    transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
+    transform-style: preserve-3d;
+  }
+  .card.flipped .card-inner{ transform: rotateY(180deg); }
+  .card.matched{ cursor:default; }
+  .card.matched .card-inner{ transform: rotateY(0deg); }
+
+  .card-face{
+    position:absolute; inset:0;
+    border-radius: var(--card-radius);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow:hidden;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+  }
+  .card-front{
+    background: var(--white);
+    border: 3px solid #ffffff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .card-front img{
+    width:100%; height:100%;
+    object-fit: cover;
+    display:block;
+    pointer-events:none;
+    -webkit-user-drag:none;
+  }
+  .card-back{
+    transform: rotateY(180deg);
+    background:
+      radial-gradient(circle at 25% 25%, rgba(255,255,255,0.35) 0 8%, transparent 9%),
+      radial-gradient(circle at 70% 60%, rgba(255,255,255,0.25) 0 10%, transparent 11%),
+      radial-gradient(circle at 50% 85%, rgba(255,255,255,0.3) 0 7%, transparent 8%),
+      linear-gradient(145deg, var(--pink-light) 0%, var(--pink) 55%, var(--pink-dark) 100%);
+    border: 3px solid var(--pink-dark);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .card-back::after{
+    content: "🌱";
+    font-size: clamp(20px, 3vw, 36px);
+    opacity:0.55;
+  }
+  .card.matched .card-back{ display:none; }
+
+  .card.correct-glow .card-front{
+    border: 3px solid var(--sun);
+    box-shadow: 0 0 0 4px rgba(255,207,86,0.6), 0 5px 0 rgba(0,0,0,0.1);
+  }
+
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    20%{ transform: translateX(-2.2%); }
+    40%{ transform: translateX(2.2%); }
+    60%{ transform: translateX(-1.6%); }
+    80%{ transform: translateX(1.6%); }
+  }
+  .card.shake{ animation: shake 0.45s ease; }
+
+  /* ---------- PROMPT BAR ---------- */
+  .prompt-bar{
+    flex-shrink:0;
+    width:100%;
+    max-width:1200px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height: 12vh;
+  }
+  .prompt-card{
+    background: var(--white);
+    border-radius: 1.4vw;
+    border: 3px dashed var(--leaf);
+    padding: 1vh 3vw;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-width: 30vw;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.06);
+  }
+  .prompt-hint{
+    font-size: clamp(11px, 1.3vw, 16px);
+    color: var(--leaf-dark);
+    opacity:0.75;
+    margin-bottom:0.2vh;
+  }
+  .prompt-pinyin{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size: clamp(24px, 4vw, 46px);
+    color: var(--pink-dark);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---------- RESET BUTTON ---------- */
+  #resetBtn{
+    position: fixed;
+    left: 1.6vw;
+    bottom: 1.6vh;
+    display:flex; align-items:center; gap:0.5vw;
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size: clamp(13px, 1.5vw, 18px);
+    color: var(--ink);
+    background: var(--sun);
+    border: none;
+    border-bottom: 4px solid var(--sun-dark);
+    padding: 1.2vh 1.6vw;
+    border-radius: 999px;
+    cursor:pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+    z-index: 20;
+  }
+  #resetBtn:active{ transform: translateY(3px); border-bottom-width: 1px; }
+
+  /* ---------- STAR OVERLAY ---------- */
+  #starOverlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+    opacity:0;
+    z-index: 30;
+  }
+  #starOverlay.show{ animation: starPop 1s ease forwards; }
+  #starOverlay .star{ font-size: clamp(60px, 12vw, 160px); filter: drop-shadow(0 0 12px rgba(255,207,86,0.9)); }
+  @keyframes starPop{
+    0%{ opacity:0; transform: scale(0.3) rotate(-15deg); }
+    25%{ opacity:1; transform: scale(1.15) rotate(5deg); }
+    45%{ opacity:1; transform: scale(1) rotate(0deg); }
+    80%{ opacity:1; transform: scale(1) rotate(0deg); }
+    100%{ opacity:0; transform: scale(1.2) rotate(0deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card-inner{ transition:none; }
+    .card.shake{ animation:none; }
+    #startBtn, #resetBtn{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <div class="veg-emoji-row">🥕 🥦 🌽 🥬 🍅</div>
+    <h1>蔬菜拼音配对</h1>
+    <p>Remember the vegetables, then match each pīnyīn to the right picture!</p>
+    <button id="startBtn">▶ Start 开始</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen">
+    <div class="top-bar">
+      <div class="timer-box" id="timerBox">
+        <span class="icon">⏱️</span><span class="value" id="timerValue">15</span>
+      </div>
+      <div class="status-label" id="statusLabel">Get ready…</div>
+      <div class="score-box">
+        <span class="icon">⭐</span><span class="value" id="scoreValue">0</span>
+      </div>
+    </div>
+
+    <div class="board-wrap">
+      <div id="board"></div>
+      <div id="starOverlay"><span class="star">🌟</span></div>
+    </div>
+
+    <div class="prompt-bar">
+      <div class="prompt-card">
+        <div class="prompt-hint">Tap the vegetable for:</div>
+        <div class="prompt-pinyin" id="promptPinyin">&nbsp;</div>
+      </div>
+    </div>
+  </div>
+
+  <button id="resetBtn">↺ Reset</button>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- Data: 18 vegetables ----
+  const VEGGIES = [
+    { py:"dòu yá",     file:"douya.jpg" },
+    { py:"dòu miáo",   file:"doumiao.jpg" },
+    { py:"cháng dòu",  file:"changdou.jpg" },
+    { py:"biǎn dòu",   file:"biandou.jpg" },
+    { py:"bái cài",    file:"baicai.jpg" },
+    { py:"bāo cài",    file:"baocai.jpg" },
+    { py:"shēng cài",  file:"shengcai.jpg" },
+    { py:"cài xīn",    file:"caixin.jpg" },
+    { py:"xī lán huā", file:"xilanhua.jpg" },
+    { py:"là jiāo",    file:"lajiao.jpg" },
+    { py:"fān qié",    file:"fanqie.jpg" },
+    { py:"mǎ líng shǔ",file:"malingshu.jpg" },
+    { py:"luó bo",     file:"luobo.jpg" },
+    { py:"yù mǐ",      file:"yumi.jpg" },
+    { py:"nán guā",    file:"nangua.jpg" },
+    { py:"huáng guā",  file:"huanggua.jpg" },
+    { py:"kǔ guā",     file:"kugua.jpg" },
+    { py:"qié zi",     file:"qiezi.jpg" }
+  ];
+
+  const MEMORIZE_SECONDS = 15;
+  const FLIP_ANIM_MS = 520;
+  const SHAKE_ANIM_MS = 460;
+  const STAR_DURATION_MS = 1000;
+
+  // ---- DOM refs ----
+  const startScreen  = document.getElementById('startScreen');
+  const startBtn      = document.getElementById('startBtn');
+  const gameScreen    = document.getElementById('gameScreen');
+  const boardEl        = document.getElementById('board');
+  const timerBox        = document.getElementById('timerBox');
+  const timerValueEl    = document.getElementById('timerValue');
+  const statusLabelEl   = document.getElementById('statusLabel');
+  const scoreValueEl    = document.getElementById('scoreValue');
+  const promptPinyinEl  = document.getElementById('promptPinyin');
+  const starOverlay     = document.getElementById('starOverlay');
+  const resetBtn        = document.getElementById('resetBtn');
+
+  // ---- State ----
+  let score = 0;
+  let roundVeggies = [];   // 8 veggies in this round
+  let matchedFiles = new Set();
+  let currentPrompt = null;
+  let locked = true;
+  let countdownId = null;
+  let timeLeft = MEMORIZE_SECONDS;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function updateScoreDisplay(){
+    scoreValueEl.textContent = score;
+  }
+
+  function addScore(delta){
+    score = Math.max(0, score + delta);
+    updateScoreDisplay();
+  }
+
+  // ---- Build a fresh round: pick 8 random unique veggies, render face-up ----
+  function buildRound(){
+    locked = true;
+    boardEl.classList.add('locked');
+    matchedFiles = new Set();
+    currentPrompt = null;
+    promptPinyinEl.textContent = '\u00A0';
+    statusLabelEl.textContent = 'Remember the vegetables! 记住蔬菜！';
+
+    roundVeggies = shuffle(VEGGIES).slice(0, 8);
+    const arrangement = shuffle(roundVeggies);
+
+    boardEl.innerHTML = '';
+    arrangement.forEach(veg => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.file = veg.file;
+
+      const inner = document.createElement('div');
+      inner.className = 'card-inner';
+
+      const front = document.createElement('div');
+      front.className = 'card-face card-front';
+      const img = document.createElement('img');
+      img.src = veg.file;
+      img.alt = veg.py;
+      img.draggable = false;
+      front.appendChild(img);
+
+      const back = document.createElement('div');
+      back.className = 'card-face card-back';
+
+      inner.appendChild(front);
+      inner.appendChild(back);
+      card.appendChild(inner);
+
+      card.addEventListener('click', () => onCardClick(card, veg));
+      boardEl.appendChild(card);
+    });
+
+    timeLeft = MEMORIZE_SECONDS;
+    timerBox.classList.remove('hidden');
+    timerValueEl.textContent = timeLeft;
+
+    clearInterval(countdownId);
+    countdownId = setInterval(() => {
+      timeLeft--;
+      if(timeLeft <= 0){
+        clearInterval(countdownId);
+        timeLeft = 0;
+        timerValueEl.textContent = 0;
+        flipAllToBack();
+      } else {
+        timerValueEl.textContent = timeLeft;
+      }
+    }, 1000);
+  }
+
+  function flipAllToBack(){
+    const cards = boardEl.querySelectorAll('.card');
+    cards.forEach(c => c.classList.add('flipped'));
+    timerBox.classList.add('hidden');
+    statusLabelEl.textContent = 'Find the vegetable! 找一找！';
+    setTimeout(() => {
+      locked = false;
+      boardEl.classList.remove('locked');
+      pickNextPrompt();
+    }, FLIP_ANIM_MS + 60);
+  }
+
+  function pickNextPrompt(){
+    const remaining = roundVeggies.filter(v => !matchedFiles.has(v.file));
+    if(remaining.length === 0) return; // round already complete
+    currentPrompt = remaining[Math.floor(Math.random() * remaining.length)];
+    promptPinyinEl.textContent = currentPrompt.py;
+  }
+
+  function onCardClick(cardEl, veg){
+    if(locked) return;
+    if(cardEl.classList.contains('matched')) return;
+    if(!currentPrompt) return;
+
+    if(veg.file === currentPrompt.file){
+      // Correct match
+      addScore(100);
+      matchedFiles.add(veg.file);
+      cardEl.classList.add('matched');
+      cardEl.classList.add('correct-glow');
+      cardEl.classList.remove('flipped');
+      locked = true;
+      boardEl.classList.add('locked');
+
+      setTimeout(() => {
+        if(matchedFiles.size >= roundVeggies.length){
+          statusLabelEl.textContent = 'Great job! 太棒了！';
+          promptPinyinEl.textContent = '\u00A0';
+          starOverlay.classList.remove('show');
+          void starOverlay.offsetWidth; // restart animation
+          starOverlay.classList.add('show');
+          setTimeout(() => {
+            starOverlay.classList.remove('show');
+            buildRound();
+          }, STAR_DURATION_MS);
+        } else {
+          locked = false;
+          boardEl.classList.remove('locked');
+          pickNextPrompt();
+        }
+      }, FLIP_ANIM_MS);
+    } else {
+      // Wrong match
+      addScore(-20);
+      locked = true;
+      boardEl.classList.add('locked');
+      cardEl.classList.add('shake');
+      setTimeout(() => {
+        cardEl.classList.remove('shake');
+        locked = false;
+        boardEl.classList.remove('locked');
+      }, SHAKE_ANIM_MS);
+    }
+  }
+
+  function startGame(){
+    startScreen.style.display = 'none';
+    gameScreen.classList.add('active');
+    score = 0;
+    updateScoreDisplay();
+    buildRound();
+  }
+
+  function resetGame(){
+    clearInterval(countdownId);
+    locked = true;
+    score = 0;
+    updateScoreDisplay();
+    boardEl.innerHTML = '';
+    promptPinyinEl.textContent = '\u00A0';
+    starOverlay.classList.remove('show');
+    gameScreen.classList.remove('active');
+    startScreen.style.display = 'flex';
+  }
+
+  startBtn.addEventListener('click', startGame);
+  resetBtn.addEventListener('click', resetGame);
+
+})();
+</script>
+</body>
+</html>
