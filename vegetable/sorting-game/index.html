@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vegetable Drag and Drop Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none; /* Prevents scrolling while dragging on iPads */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+        }
+
+        #game-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Left Side: Score Board */
+        #score-panel {
+            width: 18%;
+            height: 90vh;
+            background-color: #ffffff;
+            border: 4px solid #4CAF50;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            gap: 20px;
+        }
+
+        .score-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .score-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2E7D32;
+        }
+
+        .btn-plus {
+            width: 70px;
+            height: 70px;
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-plus:active {
+            transform: scale(0.95);
+            background-color: #388E3C;
+        }
+
+        /* Center Side: Plate Dropzone */
+        #plate-container {
+            width: 48%;
+            height: 90vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #plate-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        /* Right Side: Vegetable Grid */
+        #veg-grid {
+            width: 30%;
+            height: 90vh;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 10px;
+            background-color: #ffffff;
+            padding: 15px;
+            border: 4px solid #FF9800;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .grid-slot {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .draggable-veg {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            position: absolute;
+            cursor: grab;
+            z-index: 10;
+        }
+
+        .draggable-veg:active {
+            cursor: grabbing;
+        }
+
+        .on-plate {
+            width: 110px;
+            height: 110px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- Left: Score Record -->
+    <div id="score-panel">
+        <div class="score-title">SCORE</div>
+        <div class="score-display" id="score">0</div>
+        <button class="btn-plus" id="add-score-btn">+</button>
+    </div>
+
+    <!-- Center: Plate Drop Zone -->
+    <div id="plate-container">
+        <img id="plate-img" src="plate.jpg" alt="Plate">
+    </div>
+
+    <!-- Right: 2 Columns x 5 Rows Grid -->
+    <div id="veg-grid">
+        <div class="grid-slot" id="slot-0"><img src="qiezi.jpg" class="draggable-veg" id="veg-0" alt="qiezi"></div>
+        <div class="grid-slot" id="slot-1"><img src="douya.jpg" class="draggable-veg" id="veg-1" alt="douya"></div>
+        <div class="grid-slot" id="slot-2"><img src="fanqie.jpg" class="draggable-veg" id="veg-2" alt="fanqie"></div>
+        <div class="grid-slot" id="slot-3"><img src="yumi.jpg" class="draggable-veg" id="veg-3" alt="yumi"></div>
+        <div class="grid-slot" id="slot-4"><img src="luobo.jpg" class="draggable-veg" id="veg-4" alt="luobo"></div>
+        <div class="grid-slot" id="slot-5"><img src="huanggua.jpg" class="draggable-veg" id="veg-5" alt="huanggua"></div>
+        <div class="grid-slot" id="slot-6"><img src="nangua.jpg" class="draggable-veg" id="veg-6" alt="nangua"></div>
+        <div class="grid-slot" id="slot-7"><img src="baicai.jpg" class="draggable-veg" id="veg-7" alt="baicai"></div>
+        <div class="grid-slot" id="slot-8"><img src="kugua.jpg" class="draggable-veg" id="veg-8" alt="kugua"></div>
+        <div class="grid-slot" id="slot-9"><img src="malinshu.jpg" class="draggable-veg" id="veg-9" alt="malinshu"></div>
+    </div>
+</div>
+
+<script>
+    // Score Logic
+    let score = 0;
+    const scoreDisplay = document.getElementById('score');
+    const addScoreBtn = document.getElementById('add-score-btn');
+
+    addScoreBtn.addEventListener('click', () => {
+        score += 1000;
+        scoreDisplay.textContent = score;
+    });
+
+    // iPad Touch & Drag Logic
+    const vegs = document.querySelectorAll('.draggable-veg');
+    const plateContainer = document.getElementById('plate-container');
+
+    vegs.forEach((veg, index) => {
+        let active = false;
+        let currentX, currentY, initialX, initialY;
+        let xOffset = 0, yOffset = 0;
+
+        // Save original home parent slot index
+        veg.dataset.homeSlot = `slot-${index}`;
+
+        veg.addEventListener('touchstart', dragStart, { passive: false });
+        veg.addEventListener('touchend', dragEnd, { passive: false });
+        veg.addEventListener('touchmove', drag, { passive: false });
+
+        veg.addEventListener('mousedown', dragStart);
+        veg.addEventListener('mouseup', dragEnd);
+        veg.addEventListener('mousemove', drag);
+
+        function dragStart(e) {
+            e.preventDefault();
+            if (e.type === 'touchstart') {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+            }
+            active = true;
+            veg.style.zIndex = 1000; // Bring to front while dragging
+        }
+
+        function drag(e) {
+            if (!active) return;
+            e.preventDefault();
+
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
+            } else {
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+            }
+
+            xOffset = currentX;
+            yOffset = currentY;
+            setTranslate(currentX, currentY, veg);
+        }
+
+        function dragEnd(e) {
+            if (!active) return;
+            active = false;
+
+            // Get element center position
+            const rect = veg.getBoundingClientRect();
+            const vegCenterX = rect.left + rect.width / 2;
+            const vegCenterY = rect.top + rect.height / 2;
+
+            const plateRect = plateContainer.getBoundingClientRect();
+            const gridRect = document.getElementById('veg-grid').getBoundingClientRect();
+
+            // Check if dropped inside the plate bounds
+            if (
+                vegCenterX >= plateRect.left &&
+                vegCenterX <= plateRect.right &&
+                vegCenterY >= plateRect.top &&
+                vegCenterY <= plateRect.bottom
+            ) {
+                // Attach to plate element and resize
+                if (veg.parentElement !== plateContainer) {
+                    plateContainer.appendChild(veg);
+                    veg.classList.add('on-plate');
+                }
+                
+                // Position relative to plate container
+                const relX = vegCenterX - plateRect.left - (rect.width / 2);
+                const relY = vegCenterY - plateRect.top - (rect.height / 2);
+                
+                resetTransform(veg);
+                veg.style.left = `${relX}px`;
+                veg.style.top = `${relY}px`;
+                veg.style.zIndex = 10;
+            } 
+            // Check if returned to right-side grid area
+            else if (
+                vegCenterX >= gridRect.left &&
+                vegCenterX <= gridRect.right &&
+                vegCenterY >= gridRect.top &&
+                vegCenterY <= gridRect.bottom
+            ) {
+                returnToHome(veg);
+            } 
+            // Dropped outside both -> return to home slot automatically
+            else {
+                returnToHome(veg);
+            }
+
+            xOffset = 0;
+            yOffset = 0;
+        }
+
+        function returnToHome(element) {
+            const homeSlot = document.getElementById(element.dataset.homeSlot);
+            homeSlot.appendChild(element);
+            element.classList.remove('on-plate');
+            resetTransform(element);
+            element.style.left = 'auto';
+            element.style.top = 'auto';
+            element.style.zIndex = 10;
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        }
+
+        function resetTransform(el) {
+            el.style.transform = 'translate3d(0px, 0px, 0)';
+        }
+    });
+</script>
+</body>
+</html>
