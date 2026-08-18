@@ -120,9 +120,9 @@
         }
 
         .question {
-            font-size: 1.1em;
+            font-size: 1.8em;
             color: #333;
-            margin: 8px 0 4px 0;
+            margin: 8px 0 20px 0;
             font-weight: bold;
         }
 
@@ -170,6 +170,8 @@
             width: 180px;
             text-align: center;
             font-weight: bold;
+            cursor: default;
+            background-color: #f5f5f5;
         }
 
         input[type="number"]:focus {
@@ -285,17 +287,38 @@
         }
 
         .feedback {
-            margin-top: 8px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9em;
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 20px 25px;
+            border-radius: 12px;
+            font-size: 1.05em;
             font-weight: bold;
             display: none;
             flex-shrink: 0;
+            min-width: 200px;
+            max-width: 280px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 100;
+            line-height: 1.4;
         }
 
         .feedback.show {
             display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50%) translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0);
+            }
         }
 
         .feedback.correct {
@@ -485,6 +508,17 @@
                 padding: 12px 30px;
                 font-size: 1em;
             }
+
+            .feedback {
+                right: 10px;
+                max-width: 200px;
+                font-size: 0.95em;
+                padding: 15px 20px;
+            }
+
+            .question {
+                font-size: 1.5em;
+            }
         }
 
         @media (max-width: 480px) {
@@ -508,6 +542,21 @@
                 padding: 10px 25px;
                 font-size: 0.95em;
             }
+
+            .feedback {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                font-size: 0.9em;
+                padding: 12px 15px;
+                top: auto;
+                bottom: 100px;
+                transform: none;
+            }
+
+            .question {
+                font-size: 1.4em;
+            }
         }
     </style>
 </head>
@@ -528,11 +577,11 @@
 
             <div class="score-board">
                 <div class="score-item">
-                    <div class="score-label">Points</div>
+                    <div class="score-label">分数</div>
                     <div class="score-value" id="score">0</div>
                 </div>
                 <div class="score-item">
-                    <div class="score-label">Question</div>
+                    <div class="score-label">题目</div>
                     <div class="score-value" id="question">1/5</div>
                 </div>
             </div>
@@ -548,7 +597,7 @@
                 <div class="input-section">
                     <div class="input-controls">
                         <div class="input-row">
-                            <input type="number" id="answerInput" placeholder="0" min="0" max="20">
+                            <input type="number" id="answerInput" placeholder="0" min="0" max="20" inputmode="none" readonly>
                         </div>
                         <button class="submit-button" onclick="submitAnswer()">提交</button>
                     </div>
@@ -705,7 +754,6 @@
             document.getElementById('vegetableLabel').textContent = currentVegetable;
             document.getElementById('question').textContent = currentQuestion + '/' + totalQuestions;
             document.getElementById('answerInput').value = '';
-            document.getElementById('answerInput').focus();
             document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
             
             // Start the timer for this question
@@ -829,25 +877,36 @@
             if (currentValue.length < 2 || (currentValue.length === 1 && parseInt(currentValue + digit) <= 20)) {
                 input.value = currentValue + digit;
             }
-            input.focus();
         }
 
         function deleteLastDigit() {
             const input = document.getElementById('answerInput');
             input.value = input.value.slice(0, -1);
-            input.focus();
         }
 
         function clearInput() {
             const input = document.getElementById('answerInput');
             input.value = '';
-            input.focus();
         }
 
         // Allow Enter key to submit answer
         document.addEventListener('keypress', function(event) {
             if (event.key === 'Enter' && document.getElementById('gameScreen').classList.contains('active')) {
                 submitAnswer();
+            }
+        });
+
+        // Prevent keyboard popup on input field for iPad
+        document.addEventListener('DOMContentLoaded', function() {
+            const answerInput = document.getElementById('answerInput');
+            if (answerInput) {
+                answerInput.addEventListener('focus', function(e) {
+                    this.blur();
+                });
+                answerInput.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    this.blur();
+                });
             }
         });
 
