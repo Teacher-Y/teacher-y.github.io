@@ -228,6 +228,28 @@
             transform: translateY(0);
         }
 
+        .finish-button {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: fit-content;
+        }
+
+        .finish-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .finish-button:active {
+            transform: translateY(0);
+        }
+
         .input-controls .keypad-button.delete {
             width: 80px;
             height: 80px;
@@ -361,6 +383,12 @@
             background: #FFB6C6;
             color: #C41E3A;
             border: 2px solid #C41E3A;
+        }
+
+        .feedback.timeout {
+            background: #FFE4B5;
+            color: #D2691E;
+            border: 2px solid #D2691E;
         }
 
         .start-screen {
@@ -645,12 +673,11 @@
                     <div class="score-value" id="score">0</div>
                 </div>
                 <div class="score-item">
-                    <div class="score-label">问题</div>
-                    <div class="score-value" id="question">1/5</div>
-                </div>
-                <div class="score-item">
                     <div class="score-label">计时</div>
                     <div class="score-value" id="timer">30</div>
+                </div>
+                <div class="score-item">
+                    <button class="finish-button" onclick="finishGame()">完成</button>
                 </div>
             </div>
 
@@ -701,6 +728,7 @@
             <div style="background: rgba(255,255,255,0.1); padding: 15px 30px; border-radius: 10px; margin: 15px 0;">
                 <p style="font-size: 0.95em; color: white; margin: 5px 0;">✅ 正确: <span id="correctCount" style="font-weight: bold;">0</span></p>
                 <p style="font-size: 0.95em; color: white; margin: 5px 0;">❌ 错误: <span id="wrongCount" style="font-weight: bold;">0</span></p>
+                <p style="font-size: 0.95em; color: white; margin: 5px 0;">⏱️ 超时: <span id="timeoutCount" style="font-weight: bold;">0</span></p>
             </div>
             <p style="font-size: 1.1em; color: white; margin: 20px 0;" id="endMessage"></p>
             <button class="start-button" onclick="location.reload()" style="width: auto;">重新开始</button>
@@ -721,40 +749,8 @@
         let timeRemaining = 30;
         let correctAnswers = 0;
         let wrongAnswers = 0;
+        let timeoutAnswers = 0;
         const TIMER_DURATION = 30;
-
-        function startTimer() {
-            timeRemaining = TIMER_DURATION;
-            const timerElement = document.getElementById('timer');
-            timerElement.textContent = timeRemaining;
-            timerElement.classList.remove('warning');
-
-            timerInterval = setInterval(() => {
-                timeRemaining--;
-                timerElement.textContent = timeRemaining;
-
-                if (timeRemaining <= 10) {
-                    timerElement.classList.add('warning');
-                }
-
-                if (timeRemaining <= 0) {
-                    stopTimer();
-                    // Auto-submit with current input or 0 if empty
-                    const currentInput = document.getElementById('answerInput').value;
-                    if (currentInput === '') {
-                        document.getElementById('answerInput').value = 0;
-                    }
-                    submitAnswer();
-                }
-            }, 1000);
-        }
-
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-        }
 
         // Default game data
         const defaultGameData = [
@@ -801,6 +797,7 @@
             currentQuestion = 0;
             correctAnswers = 0;
             wrongAnswers = 0;
+            timeoutAnswers = 0;
             const container = document.querySelector('.container');
             container.classList.add('game-active');
             document.getElementById('startScreen').style.display = 'none';
@@ -810,8 +807,9 @@
 
         function loadNextQuestion() {
             if (currentImageIndex >= gameData.length) {
-                endGame();
-                return;
+                // IMPROVED: Loop back to the beginning instead of ending
+                currentImageIndex = 0;
+                currentVegetableIndex = 0;
             }
 
             currentGame = gameData[currentImageIndex];
@@ -824,8 +822,9 @@
                 currentImageIndex++;
                 currentVegetableIndex = 0;
                 if (currentImageIndex >= gameData.length) {
-                    endGame();
-                    return;
+                    // IMPROVED: Loop back to the beginning instead of ending
+                    currentImageIndex = 0;
+                    currentVegetableIndex = 0;
                 }
                 currentGame = gameData[currentImageIndex];
                 vegetables = Object.keys(currentGame).filter(key => key !== 'image');
@@ -839,11 +838,65 @@
             document.getElementById('vegetableLabel').textContent = currentVegetable;
             document.getElementById('question').textContent = currentQuestion + '/' + totalQuestions;
             document.getElementById('answerInput').value = '';
-            document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
+            document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect', 'timeout');
             
             // Start the timer for this question
             stopTimer();
             startTimer();
+        }
+
+        function startTimer() {
+            timeRemaining = TIMER_DURATION;
+            const timerElement = document.getElementById('timer');
+            timerElement.textContent = timeRemaining;
+            timerElement.classList.remove('warning');
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerElement.textContent = timeRemaining;
+
+                if (timeRemaining <= 10) {
+                    timerElement.classList.add('warning');
+                }
+
+                if (timeRemaining <= 0) {
+                    stopTimer();
+                    // IMPROVED: If no answer submitted, just skip to next question without penalty
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function handleTimeout() {
+            const inputValue = document.getElementById('answerInput').value.trim();
+            const feedback = document.getElementById('feedback');
+            
+            // If player didn't enter any answer, show timeout message and move on WITHOUT score penalty
+            if (inputValue === '') {
+                timeoutAnswers++;
+                feedback.textContent = '⏱️ Time\'s up! Moving to next question...';
+                feedback.classList.add('show', 'timeout');
+                feedback.classList.remove('correct', 'incorrect');
+                feedback.style.background = '#FFE4B5';
+                feedback.style.color = '#D2691E';
+                feedback.style.border = '2px solid #D2691E';
+                
+                // Move to next question after 1.5 seconds (no score change)
+                setTimeout(() => {
+                    currentVegetableIndex++;
+                    loadNextQuestion();
+                }, 1500);
+            } else {
+                // If player DID enter an answer, auto-submit it for scoring
+                submitAnswer();
+            }
         }
 
         function submitAnswer() {
@@ -856,7 +909,7 @@
             if (inputValue === '') {
                 feedback.textContent = '⚠️ Please enter a number!';
                 feedback.classList.add('show');
-                feedback.classList.remove('correct', 'incorrect');
+                feedback.classList.remove('correct', 'incorrect', 'timeout');
                 feedback.style.background = '#FFF9C4';
                 feedback.style.color = '#F57F17';
                 feedback.style.border = '2px solid #F57F17';
@@ -883,7 +936,7 @@
                 currentScore += 100;
                 feedback.textContent = '✅ Correct! (+100 points)';
                 feedback.classList.add('show', 'correct');
-                feedback.classList.remove('incorrect');
+                feedback.classList.remove('incorrect', 'timeout');
                 feedback.style.background = '#90EE90';
                 feedback.style.color = '#228B22';
                 feedback.style.border = '2px solid #228B22';
@@ -892,7 +945,7 @@
                 currentScore = Math.max(0, currentScore - 20);
                 feedback.textContent = '❌ Wrong! (-20 points) Correct answer: ' + correctCount + ' ' + currentVegetable;
                 feedback.classList.add('show', 'incorrect');
-                feedback.classList.remove('correct');
+                feedback.classList.remove('correct', 'timeout');
                 feedback.style.background = '#FFB6C6';
                 feedback.style.color = '#C41E3A';
                 feedback.style.border = '2px solid #C41E3A';
@@ -907,6 +960,11 @@
             setTimeout(() => {
                 loadNextQuestion();
             }, 2000);
+        }
+
+        function finishGame() {
+            stopTimer();
+            endGame();
         }
 
         function endGame() {
@@ -951,6 +1009,7 @@
             document.getElementById('endMessage').textContent = message;
             document.getElementById('correctCount').textContent = correctAnswers;
             document.getElementById('wrongCount').textContent = wrongAnswers;
+            document.getElementById('timeoutCount').textContent = timeoutAnswers;
         }
 
         // Virtual Keypad Functions
