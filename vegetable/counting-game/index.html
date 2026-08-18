@@ -163,15 +163,19 @@
         }
 
         input[type="number"] {
-            padding: 15px 20px;
-            font-size: 1.4em;
+            padding: 30px 25px;
+            font-size: 3em;
             border: 3px solid #667eea;
-            border-radius: 12px;
-            width: 180px;
+            border-radius: 16px;
+            width: 220px;
+            height: 140px;
             text-align: center;
             font-weight: bold;
             cursor: default;
             background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         input[type="number"]:focus {
@@ -242,21 +246,29 @@
 
         .keypad {
             display: grid;
-            grid-template-columns: repeat(3, 60px);
-            gap: 8px;
+            grid-template-columns: repeat(3, 70px) 80px;
+            grid-auto-rows: 75px;
+            gap: 10px;
+        }
+
+        .keypad-button.delete {
+            grid-row: 1 / 4;
+            min-height: auto;
+            padding: 15px 10px;
+            font-size: 1.2em;
         }
 
         .keypad-button {
             padding: 12px 10px;
-            font-size: 1.05em;
+            font-size: 1.2em;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: bold;
             transition: transform 0.2s, box-shadow 0.2s;
-            min-height: 55px;
+            min-height: 75px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -271,11 +283,11 @@
             transform: scale(0.98);
         }
 
-        .keypad-button.clear {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
         .keypad-button.delete {
+            grid-row: 1 / 4;
+            min-height: auto;
+            padding: 15px 10px;
+            font-size: 1.2em;
             background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
 
@@ -488,20 +500,27 @@
             }
 
             .keypad {
-                grid-template-columns: repeat(3, 55px);
-                gap: 6px;
+                grid-template-columns: repeat(3, 60px) 70px;
+                grid-auto-rows: 65px;
+                gap: 8px;
             }
 
             .keypad-button {
-                min-height: 50px;
+                min-height: 65px;
                 font-size: 1em;
                 padding: 10px 8px;
             }
 
+            .keypad-button.delete {
+                font-size: 1.1em;
+                padding: 12px 8px;
+            }
+
             input[type="number"] {
-                width: 160px;
-                padding: 12px 16px;
-                font-size: 1.2em;
+                width: 200px;
+                height: 120px;
+                padding: 20px 20px;
+                font-size: 2.5em;
             }
 
             .submit-button {
@@ -523,19 +542,26 @@
 
         @media (max-width: 480px) {
             .keypad {
-                grid-template-columns: repeat(3, 50px);
+                grid-template-columns: repeat(3, 50px) 60px;
+                grid-auto-rows: 55px;
                 gap: 5px;
             }
 
             .keypad-button {
-                min-height: 45px;
+                min-height: 55px;
                 font-size: 0.9em;
+            }
+
+            .keypad-button.delete {
+                font-size: 1em;
+                padding: 10px 6px;
             }
 
             input[type="number"] {
                 width: 140px;
+                height: 100px;
                 padding: 10px 12px;
-                font-size: 1.1em;
+                font-size: 2em;
             }
 
             .submit-button {
@@ -577,11 +603,11 @@
 
             <div class="score-board">
                 <div class="score-item">
-                    <div class="score-label">分数</div>
+                    <div class="score-label">Points</div>
                     <div class="score-value" id="score">0</div>
                 </div>
                 <div class="score-item">
-                    <div class="score-label">题目</div>
+                    <div class="score-label">Question</div>
                     <div class="score-value" id="question">1/5</div>
                 </div>
             </div>
@@ -613,10 +639,9 @@
                             <button class="keypad-button number" onclick="addToInput('7')">7</button>
                             <button class="keypad-button number" onclick="addToInput('8')">8</button>
                             <button class="keypad-button number" onclick="addToInput('9')">9</button>
-                            <button class="keypad-button clear" onclick="clearInput()">Clear</button>
-                            <button class="keypad-button number" onclick="addToInput('0')">0</button>
                             <button class="keypad-button delete" onclick="deleteLastDigit()">Delete</button>
                         </div>
+                        <div class="keyboard-hint">Press Enter to submit</div>
                     </div>
                 </div>
 
