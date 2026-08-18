@@ -137,31 +137,37 @@
             font-weight: bold;
         }
 
-        /* New layout: input on top, button and keypad below */
+        /* New layout: input and submit on left, keypad on right */
         .input-section {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            gap: 30px;
             justify-content: center;
-            align-items: center;
-            margin: 8px 0;
+            align-items: flex-start;
+            margin: 20px 0;
             flex-shrink: 0;
             width: 100%;
             padding: 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .input-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
         }
 
         .input-row {
             display: flex;
             justify-content: center;
-            width: 100%;
         }
 
         input[type="number"] {
-            padding: 12px 16px;
-            font-size: 1.1em;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            width: 120px;
+            padding: 15px 20px;
+            font-size: 1.4em;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            width: 180px;
             text-align: center;
             font-weight: bold;
         }
@@ -172,14 +178,36 @@
             box-shadow: 0 0 10px rgba(118, 75, 162, 0.3);
         }
 
-        /* Container for button and keypad on same row */
-        .controls-row {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: flex-start;
-            width: 100%;
-            flex-wrap: wrap;
+        /* Hide browser spinner controls */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"][type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .submit-button {
+            padding: 15px 35px;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
         }
 
         button {
@@ -204,22 +232,32 @@
             transform: translateY(0);
         }
 
+        .keypad-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
         .keypad {
             display: grid;
-            grid-template-columns: repeat(3, 50px);
-            gap: 6px;
+            grid-template-columns: repeat(3, 60px);
+            gap: 8px;
         }
 
         .keypad-button {
-            padding: 10px 8px;
-            font-size: 0.95em;
+            padding: 12px 10px;
+            font-size: 1.05em;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
             transition: transform 0.2s, box-shadow 0.2s;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .keypad-button:hover {
@@ -420,25 +458,54 @@
             50% { opacity: 0.7; }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            .input-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+
             .keypad {
-                grid-template-columns: repeat(3, 45px);
+                grid-template-columns: repeat(3, 55px);
+                gap: 6px;
+            }
+
+            .keypad-button {
+                min-height: 50px;
+                font-size: 1em;
+                padding: 10px 8px;
+            }
+
+            input[type="number"] {
+                width: 160px;
+                padding: 12px 16px;
+                font-size: 1.2em;
+            }
+
+            .submit-button {
+                padding: 12px 30px;
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .keypad {
+                grid-template-columns: repeat(3, 50px);
                 gap: 5px;
             }
 
             .keypad-button {
-                padding: 8px 6px;
+                min-height: 45px;
                 font-size: 0.9em;
             }
 
             input[type="number"] {
-                width: 100px;
+                width: 140px;
                 padding: 10px 12px;
-                font-size: 1em;
+                font-size: 1.1em;
             }
 
-            button {
-                padding: 10px 20px;
+            .submit-button {
+                padding: 10px 25px;
                 font-size: 0.95em;
             }
         }
@@ -450,7 +517,7 @@
         <!-- Start Screen -->
         <div class="start-screen" id="startScreen">
             <h1>🥦🥕蔬菜计数大挑战🌽🥬</h1>
-            <button class="start-button" onclick="startGame()">START GAME</button>
+            <button class="start-button" onclick="startGame()">开始游戏</button>
         </div>
 
         <!-- Game Screen -->
@@ -461,7 +528,7 @@
 
             <div class="score-board">
                 <div class="score-item">
-                    <div class="score-label">Score</div>
+                    <div class="score-label">Points</div>
                     <div class="score-value" id="score">0</div>
                 </div>
                 <div class="score-item">
@@ -475,16 +542,18 @@
                     <img id="gameImage" class="game-image" src="" alt="Vegetable image">
                 </div>
 
-                <p class="question">How many <span class="vegetable-label" id="vegetableLabel">vegetable</span> do you see?</p>
+                <p class="question">你看到多少 <span class="vegetable-label" id="vegetableLabel">vegetable</span> ？</p>
 
-                <!-- Improved Layout: Input on top, Button and Keypad on same row below -->
+                <!-- Improved Layout: Input and Submit on left, Keypad on right -->
                 <div class="input-section">
-                    <div class="input-row">
-                        <input type="number" id="answerInput" placeholder="0" min="0" max="20">
+                    <div class="input-controls">
+                        <div class="input-row">
+                            <input type="number" id="answerInput" placeholder="0" min="0" max="20">
+                        </div>
+                        <button class="submit-button" onclick="submitAnswer()">提交</button>
                     </div>
 
-                    <div class="controls-row">
-                        <button onclick="submitAnswer()">Submit</button>
+                    <div class="keypad-container">
                         <div class="keypad">
                             <button class="keypad-button number" onclick="addToInput('1')">1</button>
                             <button class="keypad-button number" onclick="addToInput('2')">2</button>
@@ -500,8 +569,6 @@
                             <button class="keypad-button delete" onclick="deleteLastDigit()">Delete</button>
                         </div>
                     </div>
-
-                    <div class="keyboard-hint">Press Enter to submit</div>
                 </div>
 
                 <div class="feedback" id="feedback"></div>
@@ -510,12 +577,16 @@
 
         <!-- End Screen -->
         <div class="end-screen" id="endScreen">
-            <h1>Game Over! 🎉</h1>
+            <h1>游戏结束🎉</h1>
             <div class="emoji" id="endEmoji">🎊</div>
-            <p style="font-size: 1.2em; color: white;">Your Final Score:</p>
-            <div class="final-score" id="finalScore">0/5</div>
+            <p style="font-size: 1.2em; color: white;">总分:</p>
+            <div class="final-score" id="finalScore">0 points</div>
+            <div style="background: rgba(255,255,255,0.1); padding: 15px 30px; border-radius: 10px; margin: 15px 0;">
+                <p style="font-size: 0.95em; color: white; margin: 5px 0;">✅ 正确: <span id="correctCount" style="font-weight: bold;">0</span></p>
+                <p style="font-size: 0.95em; color: white; margin: 5px 0;">❌ 错误: <span id="wrongCount" style="font-weight: bold;">0</span></p>
+            </div>
             <p style="font-size: 1.1em; color: white; margin: 20px 0;" id="endMessage"></p>
-            <button class="start-button" onclick="location.reload()" style="width: auto;">PLAY AGAIN</button>
+            <button class="start-button" onclick="location.reload()" style="width: auto;">重新开始</button>
         </div>
     </div>
 
@@ -531,6 +602,8 @@
         let vegetables = [];
         let timerInterval = null;
         let timeRemaining = 30;
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
         const TIMER_DURATION = 30;
 
         function startTimer() {
@@ -588,6 +661,8 @@
             currentVegetableIndex = 0;
             currentScore = 0;
             currentQuestion = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
             if (totalQuestions === 0) {
                 alert('Error: No game data loaded');
                 return;
@@ -641,7 +716,27 @@
         function submitAnswer() {
             stopTimer();
             
-            const userAnswer = parseInt(document.getElementById('answerInput').value);
+            const inputValue = document.getElementById('answerInput').value.trim();
+            const feedback = document.getElementById('feedback');
+
+            // Check for blank answer
+            if (inputValue === '') {
+                feedback.textContent = '⚠️ Please enter a number!';
+                feedback.classList.add('show');
+                feedback.classList.remove('correct', 'incorrect');
+                feedback.style.background = '#FFF9C4';
+                feedback.style.color = '#F57F17';
+                feedback.style.border = '2px solid #F57F17';
+                
+                // Move to next question after 2 seconds
+                setTimeout(() => {
+                    currentVegetableIndex++;
+                    loadNextQuestion();
+                }, 2000);
+                return;
+            }
+
+            const userAnswer = parseInt(inputValue);
 
             if (isNaN(userAnswer)) {
                 alert('Please enter a valid number');
@@ -649,16 +744,25 @@
             }
 
             const correctCount = currentGame[currentVegetable];
-            const feedback = document.getElementById('feedback');
 
             if (userAnswer === correctCount) {
-                currentScore++;
-                feedback.textContent = '✅ Correct! There were ' + correctCount + ' ' + currentVegetable + '!';
+                correctAnswers++;
+                currentScore += 100;
+                feedback.textContent = '✅ Correct! (+100 points)';
                 feedback.classList.add('show', 'correct');
+                feedback.classList.remove('incorrect');
+                feedback.style.background = '#90EE90';
+                feedback.style.color = '#228B22';
+                feedback.style.border = '2px solid #228B22';
             } else {
-                feedback.textContent = '❌ Wrong! The correct answer was ' + correctCount + ' ' + currentVegetable +
-                                       '. You said ' + userAnswer + '.';
+                wrongAnswers++;
+                currentScore = Math.max(0, currentScore - 20);
+                feedback.textContent = '❌ Wrong! (-20 points) Correct answer: ' + correctCount + ' ' + currentVegetable;
                 feedback.classList.add('show', 'incorrect');
+                feedback.classList.remove('correct');
+                feedback.style.background = '#FFB6C6';
+                feedback.style.color = '#C41E3A';
+                feedback.style.border = '2px solid #C41E3A';
             }
 
             document.getElementById('score').textContent = currentScore;
@@ -678,31 +782,42 @@
             container.classList.add('game-active');
             document.getElementById('gameScreen').classList.remove('active');
             document.getElementById('endScreen').classList.add('active');
-            document.getElementById('finalScore').textContent = currentScore + '/' + totalQuestions;
+            
+            // Calculate how many were correct (perfect score would be totalQuestions * 100)
+            // We can estimate based on the score, but let's track it properly
+            // For now, display total points
+            document.getElementById('finalScore').textContent = currentScore + ' points';
 
             let message = '';
             let emoji = '';
-            const percentage = Math.round((currentScore / totalQuestions) * 100);
+            
+            // Score ranges based on points
+            const maxPossibleScore = totalQuestions * 100;
 
-            if (currentScore === totalQuestions) {
+            if (currentScore === maxPossibleScore) {
                 emoji = '🌟';
                 message = 'Perfect score! You are a master counter!';
-            } else if (percentage >= 80) {
+            } else if (currentScore >= maxPossibleScore * 0.8) {
                 emoji = '😄';
                 message = 'Great job! You are an excellent counter!';
-            } else if (percentage >= 60) {
+            } else if (currentScore >= maxPossibleScore * 0.6) {
                 emoji = '👍';
                 message = 'Good effort! Keep practicing!';
-            } else if (percentage >= 40) {
+            } else if (currentScore >= maxPossibleScore * 0.4) {
                 emoji = '🙂';
                 message = 'Not bad! Try again to improve your score!';
-            } else {
+            } else if (currentScore > 0) {
                 emoji = '💪';
                 message = 'Better luck next time! Practice makes perfect!';
+            } else {
+                emoji = '😅';
+                message = 'Don\'t give up! Try again!';
             }
 
             document.getElementById('endEmoji').textContent = emoji;
             document.getElementById('endMessage').textContent = message;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('wrongCount').textContent = wrongAnswers;
         }
 
         // Virtual Keypad Functions
