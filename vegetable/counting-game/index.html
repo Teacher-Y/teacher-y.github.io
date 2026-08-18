@@ -137,22 +137,33 @@
             font-weight: bold;
         }
 
-        .input-group {
+        /* New layout: input on top, button and keypad below */
+        .input-section {
             display: flex;
-            gap: 6px;
+            flex-direction: column;
+            gap: 12px;
             justify-content: center;
+            align-items: center;
             margin: 8px 0;
-            flex-wrap: wrap;
             flex-shrink: 0;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
 
         input[type="number"] {
-            padding: 8px 12px;
-            font-size: 0.95em;
+            padding: 12px 16px;
+            font-size: 1.1em;
             border: 2px solid #667eea;
             border-radius: 8px;
-            width: 90px;
+            width: 120px;
             text-align: center;
+            font-weight: bold;
         }
 
         input[type="number"]:focus {
@@ -161,9 +172,19 @@
             box-shadow: 0 0 10px rgba(118, 75, 162, 0.3);
         }
 
+        /* Container for button and keypad on same row */
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
         button {
-            padding: 8px 20px;
-            font-size: 0.95em;
+            padding: 12px 24px;
+            font-size: 1em;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -171,6 +192,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: transform 0.2s, box-shadow 0.2s;
+            height: fit-content;
         }
 
         button:hover {
@@ -180,6 +202,48 @@
 
         button:active {
             transform: translateY(0);
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            gap: 6px;
+        }
+
+        .keypad-button {
+            padding: 10px 8px;
+            font-size: 0.95em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .keypad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(118, 75, 162, 0.3);
+        }
+
+        .keypad-button:active {
+            transform: scale(0.98);
+        }
+
+        .keypad-button.clear {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .keypad-button.delete {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .keyboard-hint {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 6px;
+            text-align: center;
         }
 
         .feedback {
@@ -248,288 +312,197 @@
             gap: 15px;
             font-size: 2.5em;
             margin: 20px 0;
-            flex-wrap: wrap;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
         }
 
         .start-button {
-            padding: 20px 50px;
-            font-size: 1.5em;
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            padding: 15px 40px;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
-            min-width: 280px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .start-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
 
         .start-button:active {
-            transform: translateY(-1px) scale(1.02);
+            transform: translateY(-1px);
         }
 
-        /* Responsive for landscape */
-        @media (min-aspect-ratio: 13/9) and (max-height: 700px) {
-            .container {
-                padding: 30px;
-                max-height: 95vh;
-            }
-
-            .start-screen {
-                min-height: auto;
-                padding: 20px;
-                gap: 20px;
-            }
-
-            .start-screen h1 {
-                font-size: 3em;
-            }
-
-            .start-screen .subtitle {
-                font-size: 1.3em;
-            }
-
-            .vegetable-decoration {
-                font-size: 2em;
-                gap: 10px;
-            }
-
-            .start-button {
-                padding: 15px 40px;
-                font-size: 1.2em;
-                min-width: 220px;
-            }
+        .end-screen {
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            min-height: 100vh;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 100%;
         }
 
-        @media (min-aspect-ratio: 16/9) {
-            .container {
-                max-height: 90vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
+        .end-screen.active {
+            display: flex;
+        }
 
-            .start-screen {
-                min-height: auto;
-            }
+        .end-screen h1 {
+            font-size: 3em;
+            color: white;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
 
-            .start-screen h1 {
-                font-size: 4em;
-            }
+        .emoji {
+            font-size: 4em;
+            margin: 20px 0;
+            animation: bounce 0.6s infinite alternate;
+        }
 
-            .start-screen .subtitle {
-                font-size: 1.8em;
-            }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
 
-            .vegetable-decoration {
-                font-size: 3.5em;
-            }
+        .final-score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #FFD700;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
         .game-screen {
             display: none;
+            flex-direction: column;
             width: 100%;
-            height: 100vh;
+            height: 100%;
             overflow: hidden;
-            padding: 12px;
-            box-sizing: border-box;
         }
 
         .game-screen.active {
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
 
-        .game-screen h1 {
-            font-size: 1.4em;
-            margin: 0 0 8px 0;
-            flex-shrink: 0;
+        .game-screen .game-area {
+            flex: 1;
+            overflow-y: auto;
         }
 
-        .end-screen {
-            display: none;
+        .timer-container {
             text-align: center;
+            padding: 10px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+            flex-shrink: 0;
         }
 
-        .end-screen.active {
-            display: block;
-        }
-
-        .final-score {
-            font-size: 3em;
+        .timer {
+            font-size: 1.3em;
+            font-weight: bold;
             color: #667eea;
-            font-weight: bold;
-            margin: 30px 0;
         }
 
-        .emoji {
-            font-size: 3em;
-            margin: 20px;
-        }
-
-        .keyboard-hint {
-            color: #999;
-            font-size: 0.7em;
-            margin: 2px 0;
-            flex-shrink: 0;
-        }
-
-        .virtual-keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin: 8px auto;
-            padding: 8px;
-            background: #f5f5f5;
-            border-radius: 10px;
-            max-width: 260px;
-            flex-shrink: 0;
-        }
-
-        .keypad-button {
-            padding: 8px 4px;
-            font-size: 0.95em;
-            font-weight: bold;
-            background: #e0e0e0;
-            border: 2px solid #999;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #333;
-        }
-
-        .keypad-button:hover {
-            background: #d0d0d0;
-            transform: scale(1.03);
-        }
-
-        .keypad-button:active {
-            transform: scale(0.95);
-            background: #c0c0c0;
-        }
-
-        .keypad-button.number {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-        }
-
-        .keypad-button.number:hover {
-            background: linear-gradient(135deg, #7a8eea 0%, #8a5ab2 100%);
-        }
-
-        .keypad-button.action {
-            grid-column: span 1;
-            background: #FF9800;
-            color: white;
-            border-color: #FF9800;
-        }
-
-        .keypad-button.action:hover {
-            background: #FB8C00;
-        }
-
-        .keypad-button.delete {
-            background: #f44336;
-            color: white;
-            border-color: #f44336;
-        }
-
-        .keypad-button.delete:hover {
-            background: #da190b;
-        }
-
-        .keypad-button.clear {
-            background: #9C27B0;
-            color: white;
-            border-color: #9C27B0;
-        }
-
-        .keypad-button.clear:hover {
-            background: #8a1f8a;
-        }
-
-        #timer.warning {
-            color: #C41E3A;
-            animation: pulse 0.5s infinite;
+        .timer.warning {
+            color: #ff6b6b;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @media (max-width: 600px) {
+            .keypad {
+                grid-template-columns: repeat(3, 45px);
+                gap: 5px;
             }
-            50% {
-                transform: scale(1.1);
+
+            .keypad-button {
+                padding: 8px 6px;
+                font-size: 0.9em;
+            }
+
+            input[type="number"] {
+                width: 100px;
+                padding: 10px 12px;
+                font-size: 1em;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.95em;
             }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <!-- Start Screen -->
         <div class="start-screen" id="startScreen">
-            <h1>🥦 🌽 🥬 蔬菜大挑战 🥕 🥒 🍅</h1>
-
-            <button class="start-button" onclick="startGame()">开始游戏</button>
+            <h1>🥦🥕蔬菜计数大挑战🌽🥬</h1>
+            <button class="start-button" onclick="startGame()">START GAME</button>
         </div>
 
         <!-- Game Screen -->
         <div class="game-screen" id="gameScreen">
-            <h1 style="font-size: 2em; margin-bottom: 20px;">🥕 Vegetable Counter 🥬</h1>
-            
+            <div class="timer-container">
+                <div class="timer" id="timer">30</div>
+            </div>
+
             <div class="score-board">
                 <div class="score-item">
                     <div class="score-label">Score</div>
                     <div class="score-value" id="score">0</div>
                 </div>
                 <div class="score-item">
-                    <div class="score-label">Time Left</div>
-                    <div class="score-value" id="timer">30</div>
+                    <div class="score-label">Question</div>
+                    <div class="score-value" id="question">1/5</div>
                 </div>
             </div>
 
             <div class="game-area">
                 <div class="image-container active" id="imageContainer">
-                    <img class="game-image" id="gameImage" src="" alt="Game image">
+                    <img id="gameImage" class="game-image" src="" alt="Vegetable image">
                 </div>
 
-                <div class="question">
-                    How many <span class="vegetable-label" id="vegetableLabel">?</span> are there?                    <input type="number" id="answerInput" min="0" max="20" placeholder="0" inputmode="none">
-                    <button onclick="submitAnswer()">Submit</button>
-                    <div class="virtual-keypad">
-                    <button class="keypad-button number" onclick="addToInput('1')">1</button>
-                    <button class="keypad-button number" onclick="addToInput('2')">2</button>
-                    <button class="keypad-button number" onclick="addToInput('3')">3</button>
-                    <button class="keypad-button number" onclick="addToInput('4')">4</button>
-                    <button class="keypad-button number" onclick="addToInput('5')">5</button>
-                    <button class="keypad-button number" onclick="addToInput('6')">6</button>
-                    <button class="keypad-button number" onclick="addToInput('7')">7</button>
-                    <button class="keypad-button number" onclick="addToInput('8')">8</button>
-                    <button class="keypad-button number" onclick="addToInput('9')">9</button>
-                    <button class="keypad-button clear" onclick="clearInput()">Clear</button>
-                    <button class="keypad-button number" onclick="addToInput('0')">0</button>
-                    <button class="keypad-button delete" onclick="deleteLastDigit()">Delete</button>
-                </div>
-                </div>
+                <p class="question">How many <span class="vegetable-label" id="vegetableLabel">vegetable</span> do you see?</p>
 
-                <div class="keyboard-hint">Press Enter to submit</div>
+                <!-- Improved Layout: Input on top, Button and Keypad on same row below -->
+                <div class="input-section">
+                    <div class="input-row">
+                        <input type="number" id="answerInput" placeholder="0" min="0" max="20">
+                    </div>
+
+                    <div class="controls-row">
+                        <button onclick="submitAnswer()">Submit</button>
+                        <div class="keypad">
+                            <button class="keypad-button number" onclick="addToInput('1')">1</button>
+                            <button class="keypad-button number" onclick="addToInput('2')">2</button>
+                            <button class="keypad-button number" onclick="addToInput('3')">3</button>
+                            <button class="keypad-button number" onclick="addToInput('4')">4</button>
+                            <button class="keypad-button number" onclick="addToInput('5')">5</button>
+                            <button class="keypad-button number" onclick="addToInput('6')">6</button>
+                            <button class="keypad-button number" onclick="addToInput('7')">7</button>
+                            <button class="keypad-button number" onclick="addToInput('8')">8</button>
+                            <button class="keypad-button number" onclick="addToInput('9')">9</button>
+                            <button class="keypad-button clear" onclick="clearInput()">Clear</button>
+                            <button class="keypad-button number" onclick="addToInput('0')">0</button>
+                            <button class="keypad-button delete" onclick="deleteLastDigit()">Delete</button>
+                        </div>
+                    </div>
+
+                    <div class="keyboard-hint">Press Enter to submit</div>
+                </div>
 
                 <div class="feedback" id="feedback"></div>
             </div>
@@ -539,10 +512,10 @@
         <div class="end-screen" id="endScreen">
             <h1>Game Over! 🎉</h1>
             <div class="emoji" id="endEmoji">🎊</div>
-            <p style="font-size: 1.2em; color: #666;">Your Final Score:</p>
+            <p style="font-size: 1.2em; color: white;">Your Final Score:</p>
             <div class="final-score" id="finalScore">0/5</div>
-            <p style="font-size: 1.1em; color: #666; margin: 20px 0;" id="endMessage"></p>
-            <button onclick="location.reload()" style="width: 100%; padding: 15px; font-size: 1.1em;">PLAY AGAIN</button>
+            <p style="font-size: 1.1em; color: white; margin: 20px 0;" id="endMessage"></p>
+            <button class="start-button" onclick="location.reload()" style="width: auto;">PLAY AGAIN</button>
         </div>
     </div>
 
@@ -655,6 +628,7 @@
             // Update UI
             document.getElementById('gameImage').src = currentGame.image;
             document.getElementById('vegetableLabel').textContent = currentVegetable;
+            document.getElementById('question').textContent = currentQuestion + '/' + totalQuestions;
             document.getElementById('answerInput').value = '';
             document.getElementById('answerInput').focus();
             document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
@@ -710,7 +684,7 @@
             let emoji = '';
             const percentage = Math.round((currentScore / totalQuestions) * 100);
 
-            if (currentScore === totalRounds) {
+            if (currentScore === totalQuestions) {
                 emoji = '🌟';
                 message = 'Perfect score! You are a master counter!';
             } else if (percentage >= 80) {
